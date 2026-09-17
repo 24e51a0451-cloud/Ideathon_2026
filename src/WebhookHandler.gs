@@ -203,14 +203,16 @@ function verifyAndUpdateRegistration(details) {
       return { success: false, message: 'Registration record not found in Google Sheet' };
     }
 
-    // Read existing row data
-    const rowValues = sheet.getRange(targetRow, 1, 1, 28).getValues()[0];
+    // Read existing row data (52 columns)
+    const rowValues = sheet.getRange(targetRow, 1, 1, 52).getValues()[0];
     const currentStatus = rowValues[CONFIG.COLUMNS.PAYMENT_STATUS - 1];
     const confirmationSent = rowValues[CONFIG.COLUMNS.CONFIRMATION_SENT - 1];
     const expectedFee = Number(rowValues[CONFIG.COLUMNS.REGISTRATION_FEE - 1]);
     const registrationId = rowValues[CONFIG.COLUMNS.REGISTRATION_ID - 1];
-    const participantName = rowValues[CONFIG.COLUMNS.FULL_NAME - 1];
-    const email = rowValues[CONFIG.COLUMNS.EMAIL - 1];
+    const teamName = rowValues[CONFIG.COLUMNS.TEAM_NAME - 1] || 'Team';
+    const teamSize = rowValues[CONFIG.COLUMNS.TEAM_SIZE - 1] || '3 Members';
+    const leadName = rowValues[CONFIG.COLUMNS.LEAD_NAME - 1];
+    const leadEmail = rowValues[CONFIG.COLUMNS.LEAD_EMAIL - 1];
 
     // Idempotency check: If already confirmed and marked PAID, skip duplicate
     if (currentStatus === CONFIG.STATUS.PAID && confirmationSent === 'Yes') {
@@ -292,22 +294,88 @@ function verifyAndUpdateRegistration(details) {
     sheet.getRange(targetRow, CONFIG.COLUMNS.ERROR).setValue('');
     SpreadsheetApp.flush();
 
-    // Send confirmation email
+    // Prepare team member roster and email list
+    const leadIeeeStatus = (rowValues[CONFIG.COLUMNS.LEAD_IEEE_MEMBER - 1] || '').toString().toLowerCase();
+    const leadIeeeNum = (rowValues[CONFIG.COLUMNS.LEAD_IEEE_NUMBER - 1] || '').toString().trim();
+    const isLeadIeee = leadIeeeStatus.includes('yes') || leadIeeeStatus.includes('300') || (leadIeeeStatus.includes('ieee') && !leadIeeeStatus.includes('non'));
+
+    const m2Name = rowValues[CONFIG.COLUMNS.MEMBER2_NAME - 1];
+    const m2Email = rowValues[CONFIG.COLUMNS.MEMBER2_EMAIL - 1];
+    const m2College = rowValues[CONFIG.COLUMNS.MEMBER2_COLLEGE - 1];
+    const m2IeeeStatus = (rowValues[CONFIG.COLUMNS.MEMBER2_IEEE_MEMBER - 1] || '').toString().toLowerCase();
+    const m2IeeeNum = (rowValues[CONFIG.COLUMNS.MEMBER2_IEEE_NUMBER - 1] || '').toString().trim();
+    const isM2Ieee = m2IeeeStatus.includes('yes') || m2IeeeStatus.includes('300') || (m2IeeeStatus.includes('ieee') && !m2IeeeStatus.includes('non'));
+
+    const m3Name = rowValues[CONFIG.COLUMNS.MEMBER3_NAME - 1];
+    const m3Email = rowValues[CONFIG.COLUMNS.MEMBER3_EMAIL - 1];
+    const m3College = rowValues[CONFIG.COLUMNS.MEMBER3_COLLEGE - 1];
+    const m3IeeeStatus = (rowValues[CONFIG.COLUMNS.MEMBER3_IEEE_MEMBER - 1] || '').toString().toLowerCase();
+    const m3IeeeNum = (rowValues[CONFIG.COLUMNS.MEMBER3_IEEE_NUMBER - 1] || '').toString().trim();
+    const isM3Ieee = m3IeeeStatus.includes('yes') || m3IeeeStatus.includes('300') || (m3IeeeStatus.includes('ieee') && !m3IeeeStatus.includes('non'));
+
+    const m4Name = rowValues[CONFIG.COLUMNS.MEMBER4_NAME - 1];
+    const m4Email = rowValues[CONFIG.COLUMNS.MEMBER4_EMAIL - 1];
+    const m4College = rowValues[CONFIG.COLUMNS.MEMBER4_COLLEGE - 1];
+    const m4IeeeStatus = (rowValues[CONFIG.COLUMNS.MEMBER4_IEEE_MEMBER - 1] || '').toString().toLowerCase();
+    const m4IeeeNum = (rowValues[CONFIG.COLUMNS.MEMBER4_IEEE_NUMBER - 1] || '').toString().trim();
+    const isM4Ieee = m4IeeeStatus.includes('yes') || m4IeeeStatus.includes('300') || (m4IeeeStatus.includes('ieee') && !m4IeeeStatus.includes('non'));
+
+    const teamMembersList = [
+      {
+        role: 'Team Lead',
+        name: leadName,
+        email: leadEmail,
+        college: rowValues[CONFIG.COLUMNS.LEAD_COLLEGE - 1],
+        status: isLeadIeee ? `IEEE Member (ID: ${leadIeeeNum || 'Provided'})` : 'Non-IEEE Member',
+        ieeeNumber: leadIeeeNum
+      },
+      {
+        role: 'Member 2',
+        name: m2Name,
+        email: m2Email,
+        college: m2College,
+        status: isM2Ieee ? `IEEE Member (ID: ${m2IeeeNum || 'Provided'})` : 'Non-IEEE Member',
+        ieeeNumber: m2IeeeNum
+      },
+      {
+        role: 'Member 3',
+        name: m3Name,
+        email: m3Email,
+        college: m3College,
+        status: isM3Ieee ? `IEEE Member (ID: ${m3IeeeNum || 'Provided'})` : 'Non-IEEE Member',
+        ieeeNumber: m3IeeeNum
+      }
+    ];
+
+    const allRecipientEmails = [leadEmail, m2Email, m3Email];
+    if (m4Name && m4Email) {
+      teamMembersList.push({
+        role: 'Member 4',
+        name: m4Name,
+        email: m4Email,
+        college: m4College,
+        status: isM4Ieee ? `IEEE Member (ID: ${m4IeeeNum || 'Provided'})` : 'Non-IEEE Member',
+        ieeeNumber: m4IeeeNum
+      });
+      allRecipientEmails.push(m4Email);
+    }
+
+    // Send official registration confirmation pass
     if (confirmationSent !== 'Yes') {
       try {
         EmailTemplates.sendConfirmationEmail({
-          fullName: participantName,
-          email: email,
+          teamName: teamName,
+          teamSize: teamSize,
+          leadName: leadName,
+          leadEmail: leadEmail,
+          allEmails: allRecipientEmails.filter(em => em && em.includes('@')),
           registrationId: registrationId,
-          participantType: rowValues[CONFIG.COLUMNS.PARTICIPANT_TYPE - 1],
-          ieeeStatus: rowValues[CONFIG.COLUMNS.IEEE_STATUS - 1],
-          internalExternal: rowValues[CONFIG.COLUMNS.INTERNAL_EXTERNAL - 1],
           ieeeTrack: rowValues[CONFIG.COLUMNS.IEEE_TRACK - 1],
           domain: rowValues[CONFIG.COLUMNS.INNOVATION_DOMAIN - 1],
           title: rowValues[CONFIG.COLUMNS.IDEATHON_TITLE - 1],
-          teamName: rowValues[CONFIG.COLUMNS.TEAM_NAME - 1],
-          teamSize: rowValues[CONFIG.COLUMNS.TEAM_SIZE - 1],
-          teamMembers: rowValues[CONFIG.COLUMNS.TEAM_MEMBERS - 1],
+          problemStatement: rowValues[CONFIG.COLUMNS.PROBLEM_STATEMENT - 1],
+          solutionDescription: rowValues[CONFIG.COLUMNS.SOLUTION_DESCRIPTION - 1],
+          members: teamMembersList,
           paymentId: effectivePaymentId,
           amountPaid: actualPaidRupees,
           verifiedAt: nowTimestamp
@@ -316,7 +384,7 @@ function verifyAndUpdateRegistration(details) {
         sheet.getRange(targetRow, CONFIG.COLUMNS.CONFIRMATION_SENT).setValue('Yes');
         SpreadsheetApp.flush();
       } catch (mailErr) {
-        Logger.log(`Failed to send confirmation email to ${email}: ${mailErr.message}`);
+        Logger.log(`Failed to send confirmation email for team ${teamName}: ${mailErr.message}`);
         sheet.getRange(targetRow, CONFIG.COLUMNS.ERROR).setValue(`Confirmation Email Error: ${mailErr.message}`);
         SpreadsheetApp.flush();
       }
@@ -326,6 +394,7 @@ function verifyAndUpdateRegistration(details) {
       success: true,
       message: 'Payment successfully verified and recorded',
       registrationId: registrationId,
+      teamName: teamName,
       paymentId: effectivePaymentId,
       amount: actualPaidRupees
     };

@@ -1,20 +1,20 @@
-# Deployment, Testing & Verification Guide: IEEE IDEATHON 2026
+# Deployment, Testing & Verification Guide: INNOVISION 2026
 
-This guide provides an exhaustive, step-by-step manual for student organizers to deploy, configure, test, and maintain the IEEE Ideathon 2026 registration and automated payment verification system.
+This guide provides an exhaustive, step-by-step manual for student organizers to deploy, configure, test, and maintain the INNOVISION 2026 registration, 3-Section Google Form, and dynamic Razorpay UPI QR payment verification system.
 
 ---
 
 ## Part 1: Step-by-Step Deployment Guide
 
 ### Step 1: Create Google Form and Link to Google Sheet
-1. Follow [GOOGLE_FORM_SPEC.md](GOOGLE_FORM_SPEC.md) to build the 3-section Google Form, OR use the 1-click `buildGoogleForm` function inside Google Apps Script!
+1. Follow [GOOGLE_FORM_SPEC.md](GOOGLE_FORM_SPEC.md) to review the 3-section Google Form, OR use the 1-click `buildGoogleForm` function inside Google Apps Script!
 2. In Google Forms $\rightarrow$ **Responses** tab $\rightarrow$ click the **Link to Sheets** icon.
-3. Select **Create a new spreadsheet** named `IEEE IDEATHON 2026 - Registrations`.
+3. Select **Create a new spreadsheet** named `INNOVISION 2026 - Registrations`.
 4. Open the created Google Sheet. Rename the active response sheet tab to `Registrations`.
 
 ### Step 2: Open Google Apps Script Editor
 1. In the Google Sheet top menu, click **Extensions** $\rightarrow$ **Apps Script**.
-2. Rename the Apps Script project to `IEEE-IDEATHON-2026-Backend`.
+2. Rename the Apps Script project to `INNOVISION-2026-Backend`.
 
 ### Step 3: Paste the Code
 - Open [UnifiedAppsScript.js](../src/UnifiedAppsScript.js), copy the entire contents, and paste it into `Code.gs`.
@@ -25,13 +25,13 @@ This guide provides an exhaustive, step-by-step manual for student organizers to
 2. Scroll to **Script Properties** $\rightarrow$ Click **Add script property**:
    - `RAZORPAY_KEY_ID`: `rzp_test_...` (from Razorpay Dashboard)
    - `RAZORPAY_KEY_SECRET`: Your Razorpay test secret
-   - `WEBHOOK_SECRET`: `Ideathon2026SecureSecret!`
+   - `WEBHOOK_SECRET`: `Innovision2026SecureSecret!`
 3. Click **Save script properties**.
 
 ### Step 5: Run Initial Sheet & Dashboard Setup
 1. In the Apps Script top toolbar dropdown, select the function **`setupSheet`**.
 2. Click **Run** and grant required Google permissions.
-3. Check your Google Sheet: You will now see professional Navy Blue headers on the `Registrations` sheet and a fully populated `Dashboard` tab with live KPI formula cards!
+3. Check your Google Sheet: You will now see professional Navy Blue headers across all 52 columns on the `Registrations` sheet and a fully populated `Dashboard` tab with live KPI formula cards!
 
 ### Step 6: Install Form Submission Trigger
 1. In the function dropdown, select **`installTriggers`**.
@@ -42,7 +42,7 @@ This guide provides an exhaustive, step-by-step manual for student organizers to
 1. At the top right of the Apps Script editor, click **Deploy** $\rightarrow$ **New deployment**.
 2. Click the gear icon ⚙️ next to *Select type* $\rightarrow$ choose **Web app**.
 3. Configure the deployment settings:
-   - **Description**: `IEEE Ideathon 2026 Webhook & Callback Endpoint`
+   - **Description**: `INNOVISION 2026 Webhook & Callback Endpoint`
    - **Execute as**: `Me (your_email@gmail.com)`
    - **Who has access**: `Anyone` *(Crucial: Razorpay servers need to post webhooks to this endpoint without logging into Google)*
 4. Click **Deploy**.
@@ -68,46 +68,39 @@ This guide provides an exhaustive, step-by-step manual for student organizers to
 
 ## Part 2: Complete Testing Procedures (Razorpay Test Mode)
 
-### Test 1: HITAM Internal – IEEE Member
-- **Test Input**: Category `HITAM Internal – IEEE Member`
+### Test 1: 3-Member Team (All Non-IEEE Members)
+- **Test Input**: 3 Members, all answered "No" for IEEE Member.
 - **Expected Results**:
-  - Registration ID: `IDEATHON-2026-00001`
-  - Fee: **`₹300`**
-  - Email with button linking to Razorpay Payment Link for **₹300**.
+  - Registration ID: `INNOVISION-2026-00001`
+  - Total Team Fee: **`₹600`** (3 × ₹200)
+  - Payment Email with dynamic scannable UPI QR code and payment button for **₹600**.
   - Pay via Razorpay Test Card (`4111 1111 1111 1111`, expiry in future, OTP `123456`).
   - Sheet updates to **`Paid`** with `Payment ID` (`pay_...`).
-  - Confirmation email received with pass details.
+  - Confirmation email with official team pass dispatched to all 3 members.
 
-### Test 2: HITAM Internal – Non-IEEE Member
-- **Test Input**: Category `HITAM Internal – Non-IEEE Member`
+### Test 2: 3-Member Team (Lead IEEE Member + 2 Non-IEEE Members)
+- **Test Input**: Lead is IEEE Member (provides 8-digit IEEE ID), Member 2 & 3 are Non-IEEE.
 - **Expected Results**:
-  - Registration ID: `IDEATHON-2026-00002`
-  - Fee: **`₹200`**
+  - Registration ID: `INNOVISION-2026-00002`
+  - Total Team Fee: **`₹700`** (₹300 + ₹200 + ₹200)
   - Sheet updates to **`Paid`** $\rightarrow$ Confirmation email dispatched.
 
-### Test 3: External – IEEE Member
-- **Test Input**: Category `External – IEEE Member`
+### Test 3: 4-Member Team (2 IEEE Members + 2 Non-IEEE Members)
+- **Test Input**: 4 Members total, 2 IEEE Members (with IDs) + 2 Non-IEEE.
 - **Expected Results**:
-  - Registration ID: `IDEATHON-2026-00003`
-  - Fee: **`₹300`**
-  - Sheet updates to **`Paid`**.
-
-### Test 4: External – Non-IEEE Member
-- **Test Input**: Category `External – Non-IEEE Member`
-- **Expected Results**:
-  - Registration ID: `IDEATHON-2026-00004`
-  - Fee: **`₹200`**
-  - Sheet updates to **`Paid`**.
+  - Registration ID: `INNOVISION-2026-00003`
+  - Total Team Fee: **`₹1000`** (2 × ₹300 + 2 × ₹200)
+  - Sheet updates to **`Paid`** $\rightarrow$ Confirmation email dispatched to all 4 members.
 
 ---
 
 ## Part 3: Final Pre-Flight Launch Checklist
 
-- [ ] Google Form questions tested and response spreadsheet verified.
+- [ ] Google Form questions tested and response spreadsheet verified across 52 columns.
 - [ ] Script properties set (`RAZORPAY_KEY_ID`, `RAZORPAY_KEY_SECRET`, `WEB_APP_URL`, `WEBHOOK_SECRET`).
 - [ ] Web App deployed (`Execute as: Me`, `Who has access: Anyone`).
 - [ ] Razorpay Webhook configured and active.
-- [ ] Verified test submissions for all 4 categories generated correct ₹200/₹300 amounts.
+- [ ] Verified test submissions for team fee calculation and dynamic QR code generation.
 - [ ] Verified confirmation emails arrived cleanly with accurate details.
 - [ ] Dashboard formulas verified updating counts and revenue.
 - [ ] Clear test rows from `Registrations` sheet.

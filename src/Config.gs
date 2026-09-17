@@ -12,7 +12,7 @@
 
 const CONFIG = {
   // Event Metadata
-  EVENT_NAME: 'IEEE IDEATHON 2026',
+  EVENT_NAME: 'INNOVISION 2026',
   ORGANIZER: 'IEEE Student Branch, Hyderabad Institute of Technology and Management (HITAM)',
   ORGANIZER_SHORT: 'IEEE SB HITAM',
   EVENT_DATE: '25 September 2026',
@@ -40,8 +40,8 @@ const CONFIG = {
   DASHBOARD_SHEET_NAME: 'Dashboard',
 
   // Registration ID Prefix
-  REG_ID_PREFIX: 'IDEATHON-2026-',
-  REG_ID_PADDING: 5, // e.g. IDEATHON-2026-00001
+  REG_ID_PREFIX: 'INNOVISION-2026-',
+  REG_ID_PADDING: 5, // e.g. INNOVISION-2026-00001
 
   // Status Constants
   STATUS: {
@@ -52,36 +52,76 @@ const CONFIG = {
     VERIFICATION_ERROR: 'Verification Error'
   },
 
-  // Google Sheet Column Mapping (1-based index)
+  // Team Size Constraints
+  MIN_TEAM_SIZE: 3,
+  MAX_TEAM_SIZE: 4,
+
+  // Google Sheet Column Mapping (1-based index, total 52 columns)
   COLUMNS: {
+    // SECTION 1: Team Lead & Project Innovation
     TIMESTAMP: 1,               // Column A: Timestamp
-    FULL_NAME: 2,               // Column B: Full Name
-    EMAIL: 3,                   // Column C: Email Address
-    MOBILE: 4,                  // Column D: Mobile Number
-    COLLEGE: 5,                 // Column E: College / Institution
-    COURSE: 6,                  // Column F: Course / Degree
-    YEAR_OF_STUDY: 7,           // Column G: Year of Study
-    PARTICIPANT_TYPE: 8,        // Column H: Participant Type (Selected Option)
-    IEEE_STATUS: 9,             // Column I: IEEE Membership Status (IEEE Member / Non-IEEE Member)
-    INTERNAL_EXTERNAL: 10,      // Column J: Internal/External Status (HITAM Internal / External)
-    IEEE_TRACK: 11,             // Column K: IEEE Track
-    INNOVATION_DOMAIN: 12,      // Column L: Innovation Domain
-    IDEATHON_TITLE: 13,         // Column M: Ideathon Title
-    TEAM_NAME: 14,              // Column N: Team Name
-    TEAM_SIZE: 15,              // Column O: Team Size
-    TEAM_MEMBERS: 16,           // Column P: Team Members
-    PROBLEM_STATEMENT: 17,      // Column Q: Problem Statement
-    SOLUTION_DESCRIPTION: 18,  // Column R: Solution Description
-    REGISTRATION_ID: 19,        // Column S: Registration ID (IDEATHON-2026-00001)
-    REGISTRATION_FEE: 20,       // Column T: Registration Fee (₹)
-    PAYMENT_LINK_ID: 21,        // Column U: Payment Link ID (plink_xxxx)
-    PAYMENT_LINK: 22,           // Column V: Payment Link URL
-    PAYMENT_STATUS: 23,         // Column W: Payment Status
-    PAYMENT_ID: 24,             // Column X: Payment ID (pay_xxxx)
-    PAYMENT_AMOUNT: 25,         // Column Y: Payment Amount (₹)
-    PAYMENT_VERIFIED_AT: 26,    // Column Z: Payment Verified At
-    CONFIRMATION_SENT: 27,      // Column AA: Confirmation Sent (Yes/No)
-    ERROR: 28                   // Column AB: Error Log
+    TEAM_NAME: 2,               // Column B: Team Name
+    TEAM_SIZE: 3,               // Column C: Total Team Size (3 or 4)
+    LEAD_NAME: 4,               // Column D: Lead Full Name
+    LEAD_EMAIL: 5,              // Column E: Lead Email Address
+    LEAD_MOBILE: 6,             // Column F: Lead Mobile Number
+    LEAD_COLLEGE: 7,            // Column G: Lead College / Institution
+    LEAD_COURSE: 8,             // Column H: Lead Course / Degree
+    LEAD_YEAR: 9,               // Column I: Lead Year of Study
+    LEAD_IEEE_MEMBER: 10,       // Column J: Lead IEEE Member? (Yes/No)
+    LEAD_IEEE_NUMBER: 11,       // Column K: Lead IEEE Membership Number
+    IEEE_TRACK: 12,             // Column L: Selected IEEE Track
+    INNOVATION_DOMAIN: 13,      // Column M: Innovation Domain
+    PROJECT_TITLE: 14,          // Column N: Innovision Project Title
+    PROBLEM_STATEMENT: 15,      // Column O: Brief Problem Statement
+    SOLUTION_DESCRIPTION: 16,   // Column P: Brief Solution Description
+
+    // SECTION 2: Team Participants Details
+    // Member 2
+    MEMBER2_NAME: 17,           // Column Q: Member 2 Full Name
+    MEMBER2_EMAIL: 18,          // Column R: Member 2 Email Address
+    MEMBER2_MOBILE: 19,         // Column S: Member 2 Mobile Number
+    MEMBER2_COLLEGE: 20,        // Column T: Member 2 College / Institution
+    MEMBER2_COURSE: 21,         // Column U: Member 2 Course / Degree
+    MEMBER2_YEAR: 22,           // Column V: Member 2 Year of Study
+    MEMBER2_IEEE_MEMBER: 23,    // Column W: Member 2 IEEE Member? (Yes/No)
+    MEMBER2_IEEE_NUMBER: 24,    // Column X: Member 2 IEEE Membership Number
+
+    // Member 3
+    MEMBER3_NAME: 25,           // Column Y: Member 3 Full Name
+    MEMBER3_EMAIL: 26,          // Column Z: Member 3 Email Address
+    MEMBER3_MOBILE: 27,         // Column AA: Member 3 Mobile Number
+    MEMBER3_COLLEGE: 28,        // Column AB: Member 3 College / Institution
+    MEMBER3_COURSE: 29,         // Column AC: Member 3 Course / Degree
+    MEMBER3_YEAR: 30,           // Column AD: Member 3 Year of Study
+    MEMBER3_IEEE_MEMBER: 31,    // Column AE: Member 3 IEEE Member? (Yes/No)
+    MEMBER3_IEEE_NUMBER: 32,    // Column AF: Member 3 IEEE Membership Number
+
+    // Member 4 (Optional)
+    MEMBER4_NAME: 33,           // Column AG: Member 4 Full Name
+    MEMBER4_EMAIL: 34,          // Column AH: Member 4 Email Address
+    MEMBER4_MOBILE: 35,         // Column AI: Member 4 Mobile Number
+    MEMBER4_COLLEGE: 36,        // Column AJ: Member 4 College / Institution
+    MEMBER4_COURSE: 37,         // Column AK: Member 4 Course / Degree
+    MEMBER4_YEAR: 38,           // Column AL: Member 4 Year of Study
+    MEMBER4_IEEE_MEMBER: 39,    // Column AM: Member 4 IEEE Member? (Yes/No)
+    MEMBER4_IEEE_NUMBER: 40,    // Column AN: Member 4 IEEE Membership Number
+
+    // SECTION 3: Payment Acknowledgment
+    PAYMENT_ACK: 41,            // Column AO: Payment Acknowledgment
+
+    // Backend Registration & Payment Management
+    REGISTRATION_ID: 42,        // Column AP: Registration ID (INNOVISION-2026-00001)
+    REGISTRATION_FEE: 43,       // Column AQ: Total Team Registration Fee (₹)
+    PAYMENT_LINK_ID: 44,        // Column AR: Payment Link ID (plink_xxxx)
+    PAYMENT_LINK: 45,           // Column AS: Payment Link URL
+    PAYMENT_QR_URL: 46,         // Column AT: Payment QR Code Image URL
+    PAYMENT_STATUS: 47,         // Column AU: Payment Status
+    PAYMENT_ID: 48,             // Column AV: Payment ID (pay_xxxx)
+    PAYMENT_AMOUNT: 49,         // Column AW: Payment Amount (₹)
+    PAYMENT_VERIFIED_AT: 50,    // Column AX: Payment Verified At
+    CONFIRMATION_SENT: 51,      // Column AY: Confirmation Sent (Yes/No)
+    ERROR: 52                   // Column AZ: Error Log
   }
 };
 

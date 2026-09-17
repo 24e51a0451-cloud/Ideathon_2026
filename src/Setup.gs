@@ -22,28 +22,59 @@ function setupSheet() {
   }
 
   const headers = [
+    // Section 1: Team Information, Lead Details & Innovation Domain
     'Timestamp',
-    'Full Name',
-    'Email Address',
-    'Mobile Number',
-    'College / Institution',
-    'Course / Degree',
-    'Year of Study',
-    'Participant Type',
-    'IEEE Membership Status',
-    'Internal/External Status',
-    'IEEE Track',
-    'Innovation Domain',
-    'Ideathon Title',
     'Team Name',
-    'Team Size',
-    'Team Members',
-    'Problem Statement',
-    'Solution Description',
+    'Total Team Size',
+    'Lead Full Name',
+    'Lead Email Address',
+    'Lead Mobile Number',
+    'Lead College / Institution',
+    'Lead Course / Degree',
+    'Lead Year of Study',
+    'Lead IEEE Member?',
+    'Lead IEEE Membership Number',
+    'Selected IEEE Track',
+    'Innovation Domain',
+    'Innovision Project Title',
+    'Brief Problem Statement',
+    'Brief Solution Description',
+
+    // Section 2: Team Participants Details (Member 2, 3, 4)
+    'Member 2 Full Name',
+    'Member 2 Email Address',
+    'Member 2 Mobile Number',
+    'Member 2 College / Institution',
+    'Member 2 Course / Degree',
+    'Member 2 Year of Study',
+    'Member 2 IEEE Member?',
+    'Member 2 IEEE Membership Number',
+
+    'Member 3 Full Name',
+    'Member 3 Email Address',
+    'Member 3 Mobile Number',
+    'Member 3 College / Institution',
+    'Member 3 Course / Degree',
+    'Member 3 Year of Study',
+    'Member 3 IEEE Member?',
+    'Member 3 IEEE Membership Number',
+
+    'Member 4 Full Name',
+    'Member 4 Email Address',
+    'Member 4 Mobile Number',
+    'Member 4 College / Institution',
+    'Member 4 Course / Degree',
+    'Member 4 Year of Study',
+    'Member 4 IEEE Member?',
+    'Member 4 IEEE Membership Number',
+
+    // Section 3: Payment Acknowledgment & Backend Management
+    'Payment Acknowledgment',
     'Registration ID',
-    'Registration Fee',
+    'Total Team Registration Fee',
     'Payment Link ID',
-    'Payment Link',
+    'Payment Link URL',
+    'Payment QR Code URL',
     'Payment Status',
     'Payment ID',
     'Payment Amount',
@@ -66,8 +97,8 @@ function setupSheet() {
   sheet.setFrozenRows(1);
 
   // Set number formats
-  sheet.getRange('T:T').setNumberFormat('₹#,##0'); // Registration Fee
-  sheet.getRange('Y:Y').setNumberFormat('₹#,##0'); // Payment Amount
+  sheet.getRange('AQ:AQ').setNumberFormat('₹#,##0'); // Registration Fee (Col 43)
+  sheet.getRange('AW:AW').setNumberFormat('₹#,##0'); // Payment Amount (Col 49)
 
   // 2. Setup 'Dashboard' Sheet for Real-Time Event Metrics
   let dashboard = ss.getSheetByName(CONFIG.DASHBOARD_SHEET_NAME);
@@ -78,7 +109,7 @@ function setupSheet() {
 
   // Dashboard Title
   dashboard.getRange('A1:D1').merge()
-    .setValue(`📊 ${CONFIG.EVENT_NAME} — ORGANIZER LIVE METRICS`)
+    .setValue(`📊 ${CONFIG.EVENT_NAME} — TEAM REGISTRATION & METRICS`)
     .setBackground('#002855')
     .setFontColor('#ffffff')
     .setFontWeight('bold')
@@ -87,30 +118,22 @@ function setupSheet() {
 
   // Key KPI Cards
   const kpis = [
-    ['Metric', 'Formula / Count'],
-    ['Total Registrations', `=COUNTA(${CONFIG.SHEET_NAME}!S2:S)`],
-    ['Confirmed Paid Registrations', `=COUNTIF(${CONFIG.SHEET_NAME}!W2:W, "Paid")`],
-    ['Pending Payments', `=COUNTIF(${CONFIG.SHEET_NAME}!W2:W, "Payment Pending")`],
-    ['Amount Mismatches / Errors', `=COUNTIF(${CONFIG.SHEET_NAME}!W2:W, "Amount Mismatch") + COUNTIF(${CONFIG.SHEET_NAME}!W2:W, "Verification Error")`],
-    ['Total Revenue Collected (INR)', `=SUMIF(${CONFIG.SHEET_NAME}!W2:W, "Paid", ${CONFIG.SHEET_NAME}!Y2:Y)`],
+    ['Metric', 'Count / Formula'],
+    ['Total Registered Teams', `=COUNTA(${CONFIG.SHEET_NAME}!AP2:AP)`],
+    ['Confirmed Paid Teams', `=COUNTIF(${CONFIG.SHEET_NAME}!AU2:AU, "Paid")`],
+    ['Pending Payment Teams', `=COUNTIF(${CONFIG.SHEET_NAME}!AU2:AU, "Payment Pending")`],
+    ['Payment Mismatches / Errors', `=COUNTIF(${CONFIG.SHEET_NAME}!AU2:AU, "Amount Mismatch") + COUNTIF(${CONFIG.SHEET_NAME}!AU2:AU, "Verification Error")`],
+    ['Total Revenue Collected (INR)', `=SUMIF(${CONFIG.SHEET_NAME}!AU2:AU, "Paid", ${CONFIG.SHEET_NAME}!AW2:AW)`],
     ['', ''],
-    ['Category Breakdown', 'Count (Paid)'],
-    ['HITAM Internal – IEEE Member (₹300)', `=COUNTIFS(${CONFIG.SHEET_NAME}!H2:H, "*HITAM Internal – IEEE Member*", ${CONFIG.SHEET_NAME}!W2:W, "Paid")`],
-    ['HITAM Internal – Non-IEEE Member (₹200)', `=COUNTIFS(${CONFIG.SHEET_NAME}!H2:H, "*HITAM Internal – Non-IEEE Member*", ${CONFIG.SHEET_NAME}!W2:W, "Paid")`],
-    ['External – IEEE Member (₹300)', `=COUNTIFS(${CONFIG.SHEET_NAME}!H2:H, "*External – IEEE Member*", ${CONFIG.SHEET_NAME}!W2:W, "Paid")`],
-    ['External – Non-IEEE Member (₹200)', `=COUNTIFS(${CONFIG.SHEET_NAME}!H2:H, "*External – Non-IEEE Member*", ${CONFIG.SHEET_NAME}!W2:W, "Paid")`],
+    ['Team Size Breakdown', 'Paid Teams'],
+    ['3-Member Teams', `=COUNTIFS(${CONFIG.SHEET_NAME}!C2:C, "*3*", ${CONFIG.SHEET_NAME}!AU2:AU, "Paid")`],
+    ['4-Member Teams', `=COUNTIFS(${CONFIG.SHEET_NAME}!C2:C, "*4*", ${CONFIG.SHEET_NAME}!AU2:AU, "Paid")`],
     ['', ''],
-    ['Affiliation Breakdown', 'Total Paid'],
-    ['HITAM Internal Participants', `=COUNTIFS(${CONFIG.SHEET_NAME}!J2:J, "HITAM Internal", ${CONFIG.SHEET_NAME}!W2:W, "Paid")`],
-    ['External Participants', `=COUNTIFS(${CONFIG.SHEET_NAME}!J2:J, "External", ${CONFIG.SHEET_NAME}!W2:W, "Paid")`],
-    ['IEEE Members', `=COUNTIFS(${CONFIG.SHEET_NAME}!I2:I, "IEEE Member", ${CONFIG.SHEET_NAME}!W2:W, "Paid")`],
-    ['Non-IEEE Members', `=COUNTIFS(${CONFIG.SHEET_NAME}!I2:I, "Non-IEEE Member", ${CONFIG.SHEET_NAME}!W2:W, "Paid")`],
-    ['', ''],
-    ['Track Distribution', 'Total Paid'],
-    ['IEEE Sensors Council', `=COUNTIFS(${CONFIG.SHEET_NAME}!K2:K, "*Sensors*", ${CONFIG.SHEET_NAME}!W2:W, "Paid")`],
-    ['IEEE Robotics and Automation Society', `=COUNTIFS(${CONFIG.SHEET_NAME}!K2:K, "*Robotics*", ${CONFIG.SHEET_NAME}!W2:W, "Paid")`],
-    ['IEEE Communications Society', `=COUNTIFS(${CONFIG.SHEET_NAME}!K2:K, "*Communications*", ${CONFIG.SHEET_NAME}!W2:W, "Paid")`],
-    ['IEEE Women in Engineering', `=COUNTIFS(${CONFIG.SHEET_NAME}!K2:K, "*Women*", ${CONFIG.SHEET_NAME}!W2:W, "Paid")`]
+    ['Track Distribution', 'Total Paid Teams'],
+    ['IEEE Sensors Council', `=COUNTIFS(${CONFIG.SHEET_NAME}!L2:L, "*Sensors*", ${CONFIG.SHEET_NAME}!AU2:AU, "Paid")`],
+    ['IEEE Robotics and Automation Society', `=COUNTIFS(${CONFIG.SHEET_NAME}!L2:L, "*Robotics*", ${CONFIG.SHEET_NAME}!AU2:AU, "Paid")`],
+    ['IEEE Communications Society', `=COUNTIFS(${CONFIG.SHEET_NAME}!L2:L, "*Communications*", ${CONFIG.SHEET_NAME}!AU2:AU, "Paid")`],
+    ['IEEE Women in Engineering', `=COUNTIFS(${CONFIG.SHEET_NAME}!L2:L, "*Women*", ${CONFIG.SHEET_NAME}!AU2:AU, "Paid")`]
   ];
 
   dashboard.getRange(3, 1, kpis.length, 2).setValues(kpis);
@@ -118,12 +141,11 @@ function setupSheet() {
   // Style Dashboard table headers
   dashboard.getRange('A3:B3').setBackground('#006699').setFontColor('#ffffff').setFontWeight('bold');
   dashboard.getRange('A10:B10').setBackground('#006699').setFontColor('#ffffff').setFontWeight('bold');
-  dashboard.getRange('A16:B16').setBackground('#006699').setFontColor('#ffffff').setFontWeight('bold');
-  dashboard.getRange('A22:B22').setBackground('#006699').setFontColor('#ffffff').setFontWeight('bold');
+  dashboard.getRange('A14:B14').setBackground('#006699').setFontColor('#ffffff').setFontWeight('bold');
   dashboard.getRange('B8').setNumberFormat('₹#,##0'); // Total Revenue Currency format
   
   dashboard.setColumnWidth(1, 350);
-  dashboard.setColumnWidth(2, 180);
+  dashboard.setColumnWidth(2, 200);
 
   Logger.log('Setup completed successfully! Sheets "Registrations" and "Dashboard" are ready.');
 }
@@ -143,68 +165,47 @@ function installTriggers() {
     }
   }
 
-  // Create new installable trigger on form submit
+  // Create new installable trigger
   ScriptApp.newTrigger('onFormSubmit')
     .forSpreadsheet(ss)
     .onFormSubmit()
     .create();
 
-  Logger.log('Successfully installed "onFormSubmit" installable trigger.');
+  Logger.log('Successfully installed "onFormSubmit" trigger.');
 }
 
 /**
- * Diagnostic helper: Tests connection to Razorpay API using configured credentials.
+ * Verifies the Razorpay API connection.
  */
 function testRazorpayConnection() {
   const config = getScriptConfig();
-  Logger.log(`Testing Razorpay connection with Key ID: ${config.keyId}`);
-
   if (!config.keyId || !config.keySecret) {
-    Logger.log('❌ ERROR: RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET is not set in Script Properties.');
-    return 'Credentials Missing';
+    Logger.log('❌ RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET missing in Script Properties.');
+    return;
   }
 
   try {
     const url = 'https://api.razorpay.com/v1/payments?count=1';
     const authHeader = 'Basic ' + Utilities.base64Encode(`${config.keyId}:${config.keySecret}`);
-    const response = UrlFetchApp.fetch(url, {
+    const options = {
       method: 'get',
       headers: { Authorization: authHeader },
       muteHttpExceptions: true
-    });
+    };
 
-    const code = response.getResponseCode();
-    if (code === 200) {
-      Logger.log('✅ SUCCESS: Successfully authenticated with Razorpay API!');
-      return 'Connected Successfully';
+    const response = UrlFetchApp.fetch(url, options);
+    if (response.getResponseCode() === 200) {
+      Logger.log('✅ Razorpay API connection verified successfully!');
     } else {
-      Logger.log(`❌ FAILED: Razorpay returned status code ${code}: ${response.getContentText()}`);
-      return `Failed: ${code}`;
+      Logger.log(`❌ Razorpay API returned status ${response.getResponseCode()}: ${response.getContentText()}`);
     }
-  } catch (err) {
-    Logger.log('❌ EXCEPTION connecting to Razorpay: ' + err.message);
-    return `Exception: ${err.message}`;
+  } catch (e) {
+    Logger.log('❌ Connection exception: ' + e.message);
   }
 }
 
 /**
- * Helper to set Script Properties conveniently from the editor.
- * Usage: Run setProjectProperties("rzp_test_xxxx", "secret_xxxx", "https://script.google.com/...")
- */
-function setProjectProperties(keyId, keySecret, webAppUrl, webhookSecret) {
-  const props = PropertiesService.getScriptProperties();
-  if (keyId) props.setProperty('RAZORPAY_KEY_ID', keyId.trim());
-  if (keySecret) props.setProperty('RAZORPAY_KEY_SECRET', keySecret.trim());
-  if (webAppUrl) props.setProperty('WEB_APP_URL', webAppUrl.trim());
-  if (webhookSecret) props.setProperty('WEBHOOK_SECRET', webhookSecret.trim());
-
-  Logger.log('Script Properties updated successfully.');
-}
-
-/**
- * Organizer Utility: Reconciles all registrations currently marked 'Payment Pending'.
- * Queries Razorpay for each pending payment link to check if payment was completed.
- * Useful as a safety net in case of network interruptions or dropped webhooks.
+ * Reconciles any unverified pending payments against Razorpay.
  */
 function reconcilePendingPayments() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
@@ -214,25 +215,20 @@ function reconcilePendingPayments() {
   const lastRow = sheet.getLastRow();
   if (lastRow <= 1) return;
 
-  const data = sheet.getRange(2, 1, lastRow - 1, 28).getValues();
+  const data = sheet.getRange(2, 1, lastRow - 1, 52).getValues();
   let updatedCount = 0;
 
   for (let i = 0; i < data.length; i++) {
-    const rowNum = i + 2;
     const status = data[i][CONFIG.COLUMNS.PAYMENT_STATUS - 1];
     const linkId = data[i][CONFIG.COLUMNS.PAYMENT_LINK_ID - 1];
     const regId = data[i][CONFIG.COLUMNS.REGISTRATION_ID - 1];
 
     if (status === CONFIG.STATUS.PENDING && linkId) {
-      Logger.log(`Checking status for ${regId} (${linkId})...`);
       try {
         const plinkData = RazorpayService.fetchPaymentLink(linkId);
         if (plinkData.status === 'paid' && plinkData.payments && plinkData.payments.length > 0) {
-          const paymentId = plinkData.payments[0].payment_id;
-          Logger.log(`Found paid transaction for ${regId}: ${paymentId}. Verifying...`);
-          
           const result = verifyAndUpdateRegistration({
-            paymentId: paymentId,
+            paymentId: plinkData.payments[0].payment_id,
             paymentLinkId: linkId,
             registrationId: regId,
             triggerSource: 'Manual Reconciliation'
@@ -252,100 +248,88 @@ function reconcilePendingPayments() {
 }
 
 /**
- * Automatically creates and designs the complete Google Form with all 3 sections,
- * interdisciplinary degrees, 12 innovation domains, and question validations,
- * then links it directly to this Google Spreadsheet!
+ * Builds the complete 3-Section team-based Google Form (3 or 4 members)
+ * and links it directly to this Google Spreadsheet.
  */
 function buildGoogleForm() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
 
   // Create the Form
-  const form = FormApp.create(CONFIG.EVENT_NAME + ' — Official Registration');
-  form.setTitle(CONFIG.EVENT_NAME + ' — Official Registration');
+  const form = FormApp.create(CONFIG.EVENT_NAME + ' — Official Team Registration');
+  form.setTitle(CONFIG.EVENT_NAME + ' — Official Team Registration');
   form.setDescription(
     'Welcome to IEEE IDEATHON 2026 organized by the IEEE Student Branch at HITAM in collaboration with IEEE Sensors Council, IEEE Robotics and Automation Society, IEEE Communications Society, and IEEE Women in Engineering.\n\n' +
     '📅 Event Date: ' + CONFIG.EVENT_DATE + '\n' +
     '📍 Venue: ' + CONFIG.EVENT_VENUE + '\n\n' +
-    '🎓 Open to students & graduates from ALL academic backgrounds (Engineering, Medical, Law, Degree, Management, Commerce, Arts & Humanities, etc.)\n\n' +
-    '💰 Registration Fees:\n' +
-    '• IEEE Members (Internal or External): ₹' + CONFIG.FEE_IEEE_MEMBER + '\n' +
-    '• Non-IEEE Members (Internal or External): ₹' + CONFIG.FEE_NON_IEEE + '\n\n' +
-    '📌 Instructions:\n' +
-    '1. Fill out your participant, category, and ideathon details below.\n' +
-    '2. Upon submission, an automated payment link will be emailed to you.\n' +
-    '3. Pay the registration fee via UPI / Cards / NetBanking on Razorpay.\n' +
-    '4. Your registration pass will be verified and emailed immediately!'
+    '👥 Team Participation: Mandatory 3 or 4 members per team.\n' +
+    '🎓 Open to students & graduates from ALL academic backgrounds.\n\n' +
+    '💰 Registration Fee (Per Participant):\n' +
+    '• IEEE Member: ₹' + CONFIG.FEE_IEEE_MEMBER + '\n' +
+    '• Non-IEEE Member: ₹' + CONFIG.FEE_NON_IEEE + '\n' +
+    '(Total team fee is calculated dynamically based on each member’s IEEE status)\n\n' +
+    '📌 Form Structure (3 Sections):\n' +
+    '• Section 1: Team Info, Innovation Domain & Team Lead Details\n' +
+    '• Section 2: Team Participants Details (Members 2, 3, & optional 4)\n' +
+    '• Section 3: Razorpay Dynamic Payment & Instant UPI QR Instructions'
   );
   form.setAllowResponseEdits(false);
   form.setCollectEmail(true);
 
-  // SECTION 1: Participant & Academic Information
-  const nameItem = form.addTextItem();
-  nameItem.setTitle('Full Name');
-  nameItem.setHelpText('Enter your name as you would like it on your certificate and event pass.');
-  nameItem.setRequired(true);
+  const courses = ['B.Tech / Engineering', 'Medical', 'Law', 'Degree', 'Management', 'Commerce', 'Arts & Humanities', 'Other'];
+  const years = ['1st Year', '2nd Year', '3rd Year', '4th Year / Final Year', 'Graduate / Alumni'];
 
-  const emailItem = form.addTextItem();
-  emailItem.setTitle('Email Address');
-  emailItem.setHelpText('Enter a valid email address. Your payment link and event pass will be sent here.');
-  emailItem.setRequired(true);
+  // ==========================================
+  // SECTION 1: Team Info, Domain & Team Lead
+  // ==========================================
+  const teamNameItem = form.addTextItem();
+  teamNameItem.setTitle('Team Name');
+  teamNameItem.setHelpText('Enter your unique team or startup name.');
+  teamNameItem.setRequired(true);
 
-  const mobileItem = form.addTextItem();
-  mobileItem.setTitle('Mobile / WhatsApp Number');
-  mobileItem.setHelpText('10-digit mobile number for event alerts and team coordination.');
-  mobileItem.setRequired(true);
+  const teamSizeItem = form.addMultipleChoiceItem();
+  teamSizeItem.setTitle('Total Team Size');
+  teamSizeItem.setHelpText('Select whether your team has 3 or 4 participating members.');
+  teamSizeItem.setChoiceValues(['3 Members', '4 Members']);
+  teamSizeItem.setRequired(true);
 
-  const collegeItem = form.addTextItem();
-  collegeItem.setTitle('College / Institution Name');
-  collegeItem.setHelpText('If HITAM student, enter "HITAM". Otherwise, enter your full college name.');
-  collegeItem.setRequired(true);
+  const leadNameItem = form.addTextItem();
+  leadNameItem.setTitle('Team Lead (Member 1) — Full Name');
+  leadNameItem.setRequired(true);
 
-  const courseItem = form.addMultipleChoiceItem();
-  courseItem.setTitle('Course / Degree');
-  courseItem.setHelpText('Select your current or completed educational program. Interdisciplinary participation is highly encouraged!');
-  courseItem.setChoiceValues([
-    'B.Tech / Engineering',
-    'Medical',
-    'Law',
-    'Degree',
-    'Management',
-    'Commerce',
-    'Arts & Humanities',
-    'Other'
-  ]);
-  courseItem.setRequired(true);
+  const leadEmailItem = form.addTextItem();
+  leadEmailItem.setTitle('Team Lead (Member 1) — Email Address');
+  leadEmailItem.setHelpText('Primary payment link & communications will be sent to this address.');
+  leadEmailItem.setRequired(true);
 
-  const yearItem = form.addMultipleChoiceItem();
-  yearItem.setTitle('Year of Study');
-  yearItem.setChoiceValues([
-    '1st Year',
-    '2nd Year',
-    '3rd Year',
-    '4th Year / Final Year',
-    'Graduate / Alumni'
-  ]);
-  yearItem.setRequired(true);
+  const leadMobileItem = form.addTextItem();
+  leadMobileItem.setTitle('Team Lead (Member 1) — Mobile / WhatsApp Number');
+  leadMobileItem.setRequired(true);
 
-  // SECTION 2: Participant Category
-  form.addPageBreakItem().setTitle('Section 2: Participant Category & Fee');
+  const leadCollegeItem = form.addTextItem();
+  leadCollegeItem.setTitle('Team Lead (Member 1) — College / Institution Name');
+  leadCollegeItem.setHelpText('Enter "HITAM" if internal student, or full college name.');
+  leadCollegeItem.setRequired(true);
 
-  const categoryItem = form.addMultipleChoiceItem();
-  categoryItem.setTitle('Participant Type');
-  categoryItem.setHelpText(
-    'Select your registration category. Your fee is automatically determined based on this choice:\n' +
-    '• IEEE Members (Internal or External) — ₹300\n' +
-    '• Non-IEEE Members (Internal or External) — ₹200'
-  );
-  categoryItem.setChoiceValues([
-    'HITAM Internal – IEEE Member',
-    'HITAM Internal – Non-IEEE Member',
-    'External – IEEE Member',
-    'External – Non-IEEE Member'
-  ]);
-  categoryItem.setRequired(true);
+  const leadCourseItem = form.addMultipleChoiceItem();
+  leadCourseItem.setTitle('Team Lead (Member 1) — Course / Degree');
+  leadCourseItem.setChoiceValues(courses);
+  leadCourseItem.setRequired(true);
 
-  // SECTION 3: Ideathon Project Details
-  form.addPageBreakItem().setTitle('Section 3: Ideathon Project Details');
+  const leadYearItem = form.addMultipleChoiceItem();
+  leadYearItem.setTitle('Team Lead (Member 1) — Year of Study');
+  leadYearItem.setChoiceValues(years);
+  leadYearItem.setRequired(true);
+
+  const leadIeeeItem = form.addMultipleChoiceItem();
+  leadIeeeItem.setTitle('Team Lead (Member 1) — Are you an IEEE Member?');
+  leadIeeeItem.setHelpText('IEEE Member: ₹300 | Non-IEEE Member: ₹200');
+  leadIeeeItem.setChoiceValues(['Yes (IEEE Member — ₹300)', 'No (Non-IEEE Member — ₹200)']);
+  leadIeeeItem.setRequired(true);
+
+  const leadIeeeNumItem = form.addTextItem();
+  leadIeeeNumItem.setTitle('Team Lead (Member 1) — IEEE Membership Number');
+  leadIeeeNumItem.setHelpText('If IEEE member, enter your 8-digit IEEE membership number. Otherwise, enter "NA".');
+  leadIeeeNumItem.setRequired(true);
 
   const trackItem = form.addMultipleChoiceItem();
   trackItem.setTitle('Select IEEE Track');
@@ -355,7 +339,7 @@ function buildGoogleForm() {
 
   const domainItem = form.addListItem();
   domainItem.setTitle('Innovation Domain');
-  domainItem.setHelpText('Select the interdisciplinary domain that best describes your innovation.');
+  domainItem.setHelpText('Select the domain that best describes your project.');
   domainItem.setChoiceValues([
     'Healthcare & Biomedical Innovation',
     'Smart Agriculture & Food Security',
@@ -373,39 +357,163 @@ function buildGoogleForm() {
   domainItem.setRequired(true);
 
   const titleItem = form.addTextItem();
-  titleItem.setTitle('Ideathon Project Title');
-  titleItem.setHelpText('A clear, catchy title summarizing your project/solution.');
+  titleItem.setTitle('Innovision Project Title');
+  titleItem.setHelpText('A clear, catchy title summarizing your innovative idea.');
   titleItem.setRequired(true);
-
-  const partTypeItem = form.addMultipleChoiceItem();
-  partTypeItem.setTitle('Individual / Team Participation');
-  partTypeItem.setChoiceValues(['Individual', 'Team']);
-  partTypeItem.setRequired(true);
-
-  const teamNameItem = form.addTextItem();
-  teamNameItem.setTitle('Team Name');
-  teamNameItem.setHelpText('Leave blank if participating individually.');
-  teamNameItem.setRequired(false);
-
-  const teamSizeItem = form.addListItem();
-  teamSizeItem.setTitle('Total Team Size (including Team Lead)');
-  teamSizeItem.setChoiceValues(['1', '2', '3', '4']);
-  teamSizeItem.setRequired(true);
-
-  const membersItem = form.addParagraphTextItem();
-  membersItem.setTitle('Team Member Details');
-  membersItem.setHelpText('If participating as a team, list other members with their Full Name, College, and Email.');
-  membersItem.setRequired(false);
 
   const problemItem = form.addParagraphTextItem();
   problemItem.setTitle('Brief Problem Statement');
-  problemItem.setHelpText('What specific problem does your idea address? (2-4 sentences)');
+  problemItem.setHelpText('What specific problem does your innovation address? (2-4 sentences)');
   problemItem.setRequired(true);
 
   const solutionItem = form.addParagraphTextItem();
   solutionItem.setTitle('Brief Solution Description');
-  solutionItem.setHelpText('Explain your approach, technology used, or implementation plan. (3-5 sentences)');
+  solutionItem.setHelpText('Explain your approach, technology stack, and implementation plan. (3-5 sentences)');
   solutionItem.setRequired(true);
+
+  // ==========================================
+  // SECTION 2: Team Participants Details
+  // ==========================================
+  form.addPageBreakItem()
+    .setTitle('Section 2: Team Participants Details')
+    .setHelpText('Please provide complete details for Team Member 2, Team Member 3, and optionally Team Member 4.');
+
+  // Member 2
+  const m2Name = form.addTextItem();
+  m2Name.setTitle('Member 2 — Full Name');
+  m2Name.setRequired(true);
+
+  const m2Email = form.addTextItem();
+  m2Email.setTitle('Member 2 — Email Address');
+  m2Email.setHelpText('Pass & updates will also be emailed to Member 2.');
+  m2Email.setRequired(true);
+
+  const m2Mobile = form.addTextItem();
+  m2Mobile.setTitle('Member 2 — Mobile / WhatsApp Number');
+  m2Mobile.setRequired(true);
+
+  const m2College = form.addTextItem();
+  m2College.setTitle('Member 2 — College / Institution Name');
+  m2College.setRequired(true);
+
+  const m2Course = form.addMultipleChoiceItem();
+  m2Course.setTitle('Member 2 — Course / Degree');
+  m2Course.setChoiceValues(courses);
+  m2Course.setRequired(true);
+
+  const m2Year = form.addMultipleChoiceItem();
+  m2Year.setTitle('Member 2 — Year of Study');
+  m2Year.setChoiceValues(years);
+  m2Year.setRequired(true);
+
+  const m2Ieee = form.addMultipleChoiceItem();
+  m2Ieee.setTitle('Member 2 — Are you an IEEE Member?');
+  m2Ieee.setHelpText('IEEE Member: ₹300 | Non-IEEE Member: ₹200');
+  m2Ieee.setChoiceValues(['Yes (IEEE Member — ₹300)', 'No (Non-IEEE Member — ₹200)']);
+  m2Ieee.setRequired(true);
+
+  const m2IeeeNum = form.addTextItem();
+  m2IeeeNum.setTitle('Member 2 — IEEE Membership Number');
+  m2IeeeNum.setHelpText('If IEEE member, enter 8-digit number. Otherwise, enter "NA".');
+  m2IeeeNum.setRequired(true);
+
+  // Member 3
+  const m3Name = form.addTextItem();
+  m3Name.setTitle('Member 3 — Full Name');
+  m3Name.setRequired(true);
+
+  const m3Email = form.addTextItem();
+  m3Email.setTitle('Member 3 — Email Address');
+  m3Email.setHelpText('Pass & updates will also be emailed to Member 3.');
+  m3Email.setRequired(true);
+
+  const m3Mobile = form.addTextItem();
+  m3Mobile.setTitle('Member 3 — Mobile / WhatsApp Number');
+  m3Mobile.setRequired(true);
+
+  const m3College = form.addTextItem();
+  m3College.setTitle('Member 3 — College / Institution Name');
+  m3College.setRequired(true);
+
+  const m3Course = form.addMultipleChoiceItem();
+  m3Course.setTitle('Member 3 — Course / Degree');
+  m3Course.setChoiceValues(courses);
+  m3Course.setRequired(true);
+
+  const m3Year = form.addMultipleChoiceItem();
+  m3Year.setTitle('Member 3 — Year of Study');
+  m3Year.setChoiceValues(years);
+  m3Year.setRequired(true);
+
+  const m3Ieee = form.addMultipleChoiceItem();
+  m3Ieee.setTitle('Member 3 — Are you an IEEE Member?');
+  m3Ieee.setHelpText('IEEE Member: ₹300 | Non-IEEE Member: ₹200');
+  m3Ieee.setChoiceValues(['Yes (IEEE Member — ₹300)', 'No (Non-IEEE Member — ₹200)']);
+  m3Ieee.setRequired(true);
+
+  const m3IeeeNum = form.addTextItem();
+  m3IeeeNum.setTitle('Member 3 — IEEE Membership Number');
+  m3IeeeNum.setHelpText('If IEEE member, enter 8-digit number. Otherwise, enter "NA".');
+  m3IeeeNum.setRequired(true);
+
+  // Member 4 (Optional)
+  const m4Name = form.addTextItem();
+  m4Name.setTitle('Member 4 — Full Name (Leave blank if 3-member team)');
+  m4Name.setRequired(false);
+
+  const m4Email = form.addTextItem();
+  m4Email.setTitle('Member 4 — Email Address (Optional)');
+  m4Email.setRequired(false);
+
+  const m4Mobile = form.addTextItem();
+  m4Mobile.setTitle('Member 4 — Mobile / WhatsApp Number (Optional)');
+  m4Mobile.setRequired(false);
+
+  const m4College = form.addTextItem();
+  m4College.setTitle('Member 4 — College / Institution Name (Optional)');
+  m4College.setRequired(false);
+
+  const m4Course = form.addMultipleChoiceItem();
+  m4Course.setTitle('Member 4 — Course / Degree (Optional)');
+  m4Course.setChoiceValues(courses);
+  m4Course.setRequired(false);
+
+  const m4Year = form.addMultipleChoiceItem();
+  m4Year.setTitle('Member 4 — Year of Study (Optional)');
+  m4Year.setChoiceValues(years);
+  m4Year.setRequired(false);
+
+  const m4Ieee = form.addMultipleChoiceItem();
+  m4Ieee.setTitle('Member 4 — Are you an IEEE Member? (Optional)');
+  m4Ieee.setHelpText('IEEE Member: ₹300 | Non-IEEE Member: ₹200');
+  m4Ieee.setChoiceValues(['Yes (IEEE Member — ₹300)', 'No (Non-IEEE Member — ₹200)', 'NA (3-Member Team)']);
+  m4Ieee.setRequired(false);
+
+  const m4IeeeNum = form.addTextItem();
+  m4IeeeNum.setTitle('Member 4 — IEEE Membership Number (Optional)');
+  m4IeeeNum.setHelpText('Enter 8-digit number if IEEE member, else "NA".');
+  m4IeeeNum.setRequired(false);
+
+  // ==========================================
+  // SECTION 3: Razorpay Payment & Dynamic QR
+  // ==========================================
+  form.addPageBreakItem()
+    .setTitle('Section 3: Razorpay Payment & Dynamic UPI QR Method')
+    .setHelpText(
+      '💳 PAYMENT INSTRUCTIONS:\n\n' +
+      '1. Per-Participant Fee: ₹300 for IEEE Members | ₹200 for Non-IEEE Members.\n' +
+      '2. Upon clicking "Submit", our automated system instantly calculates your aggregate team fee and generates a secure Razorpay Payment Link with a dynamic UPI QR Code.\n' +
+      '3. The payment link & QR code will be dispatched to all team member emails immediately.\n' +
+      '4. You can scan the QR Code using Google Pay, PhonePe, Paytm, BHIM, or use Net Banking & Cards.\n' +
+      '5. Once verified, official Verified Participant Passes will be emailed to all team members.'
+    );
+
+  const ackItem = form.addCheckboxItem();
+  ackItem.setTitle('Payment & Registration Confirmation Acknowledgment');
+  ackItem.setChoiceValues([
+    'I agree to pay the calculated team fee via the automated Razorpay Payment Link / dynamic UPI QR Code dispatched to our emails upon submission.'
+  ]);
+  ackItem.setRequired(true);
 
   // Set destination to this Spreadsheet
   form.setDestination(FormApp.DestinationType.SPREADSHEET, ss.getId());
@@ -416,16 +524,16 @@ function buildGoogleForm() {
   // Save URLs directly into Dashboard sheet
   const dashboard = ss.getSheetByName(CONFIG.DASHBOARD_SHEET_NAME);
   if (dashboard) {
-    dashboard.getRange('A28:B28').setBackground('#006699').setFontColor('#ffffff').setFontWeight('bold')
+    dashboard.getRange('A19:B19').setBackground('#006699').setFontColor('#ffffff').setFontWeight('bold')
       .setValues([['🔗 Google Form Links', 'Direct Access URL']]);
-    dashboard.getRange('A29:B29').setValues([['Public Form (Share with Participants):', publishedUrl]]);
-    dashboard.getRange('A30:B30').setValues([['Editor Form (Edit Questions & Theme):', editUrl]]);
+    dashboard.getRange('A20:B20').setValues([['Public Team Form (Share with Participants):', publishedUrl]]);
+    dashboard.getRange('A21:B21').setValues([['Editor Form (Edit Questions & Theme):', editUrl]]);
   }
 
   Logger.log('====================================================');
-  Logger.log('🎉 GOOGLE FORM CREATED & LINKED TO SPREADSHEET!');
-  Logger.log('Form Public URL (Share with participants): ' + publishedUrl);
-  Logger.log('Form Edit URL (To edit questions): ' + editUrl);
+  Logger.log('🎉 3-SECTION TEAM GOOGLE FORM CREATED & LINKED!');
+  Logger.log('Form Public URL: ' + publishedUrl);
+  Logger.log('Form Edit URL: ' + editUrl);
   Logger.log('====================================================');
 
   return {
@@ -435,15 +543,15 @@ function buildGoogleForm() {
 }
 
 /**
- * Adds a custom menu to Google Sheets upon opening so you can
- * easily access form links and actions with one click!
+ * Adds a custom menu to Google Sheets upon opening.
  */
 function onOpen() {
   const ui = SpreadsheetApp.getUi();
-  ui.createMenu('⚡ IEEE Ideathon')
-    .addItem('🛠️ Generate / Link Google Form', 'buildGoogleForm')
+  ui.createMenu('⚡ INNOVISION 2026')
+    .addItem('🛠️ Generate / Link Team Google Form', 'buildGoogleForm')
     .addItem('📊 Format Sheet & Dashboard', 'setupSheet')
     .addItem('🔌 Install Form Trigger', 'installTriggers')
     .addItem('🔄 Reconcile Pending Payments', 'reconcilePendingPayments')
+    .addItem('🔑 Test Razorpay Connection', 'testRazorpayConnection')
     .addToUi();
 }
